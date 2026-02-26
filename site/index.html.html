@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lockbox — Stop leaking API keys when building with AI</title>
+<meta name="description" content="One password keeps all your API keys safe. Works with Claude Code, Cursor, and any AI coding tool. Free and open source.">
+<meta property="og:title" content="Lockbox — Stop leaking API keys when building with AI">
+<meta property="og:description" content="One password keeps all your API keys safe. Works with Claude Code, Cursor, and any AI coding tool. Free and open source.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yourlockbox.dev">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0c10;
+    --bg-secondary: #0f1218;
+    --bg-card: #141820;
+    --bg-card-hover: #1a1f2a;
+    --bg-terminal: #0c0e14;
+    --border: #1e2432;
+    --border-bright: #2a3142;
+    --text-primary: #e8eaf0;
+    --text-secondary: #8b92a5;
+    --text-muted: #5a6178;
+    --accent: #22d68a;
+    --accent-dim: #1aad6f;
+    --accent-glow: rgba(34, 214, 138, 0.15);
+    --accent-glow-strong: rgba(34, 214, 138, 0.25);
+    --warning: #f0a744;
+    --danger: #e8485c;
+    --blue: #4a9eff;
+    --purple: #9b7aff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 0;
+    background: rgba(10, 12, 16, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1120px; margin: 0 auto; padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+
+  .logo-icon {
+    width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+
+  .logo-icon::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    border-radius: 8px;
+  }
+
+  .logo-icon svg { width: 18px; height: 18px; fill: var(--bg-primary); position: relative; z-index: 1; }
+
+  .logo-text {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: 18px; color: var(--text-primary); letter-spacing: -0.5px;
+  }
+
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text-primary); }
+
+  .nav-cta {
+    background: var(--accent) !important; color: var(--bg-primary) !important;
+    padding: 8px 18px; border-radius: 8px; font-weight: 600 !important; transition: all 0.2s !important;
+  }
+
+  .nav-cta:hover {
+    background: var(--accent-dim) !important;
+    transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .hero {
+    padding: 160px 24px 100px; max-width: 1120px; margin: 0 auto; position: relative;
+  }
+
+  .hero-grid-bg {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120%; height: 100%;
+    background-image: linear-gradient(rgba(34,214,138,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(34,214,138,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 60% 50% at 50% 30%, black 20%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg-card); border: 1px solid var(--border-bright);
+    border-radius: 100px; padding: 6px 16px 6px 8px;
+    font-size: 13px; color: var(--text-secondary);
+    margin-bottom: 32px; animation: fadeInUp 0.6s ease both;
+  }
+
+  .hero-badge-dot {
+    width: 8px; height: 8px; background: var(--accent);
+    border-radius: 50%; animation: pulse-dot 2s ease infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow-strong); }
+    50% { box-shadow: 0 0 0 6px transparent; }
+  }
+
+  .hero h1 {
+    font-size: clamp(40px, 6vw, 68px); font-weight: 800;
+    line-height: 1.05; letter-spacing: -2px;
+    margin-bottom: 24px; animation: fadeInUp 0.6s ease 0.1s both;
+  }
+
+  .hero h1 .highlight {
+    background: linear-gradient(135deg, var(--accent), #4ae8a0);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 19px; color: var(--text-secondary); max-width: 580px;
+    line-height: 1.7; margin-bottom: 40px; font-weight: 400;
+    animation: fadeInUp 0.6s ease 0.2s both;
+  }
+
+  .hero-actions {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    margin-bottom: 64px; animation: fadeInUp 0.6s ease 0.3s both;
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: var(--bg-primary);
+    padding: 14px 28px; border-radius: 10px;
+    font-weight: 700; font-size: 15px;
+    text-decoration: none; transition: all 0.2s;
+    border: none; cursor: pointer; font-family: inherit;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-dim); transform: translateY(-2px);
+    box-shadow: 0 8px 30px var(--accent-glow);
+  }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg-card); color: var(--text-primary);
+    padding: 14px 28px; border-radius: 10px;
+    font-weight: 600; font-size: 15px;
+    text-decoration: none; transition: all 0.2s;
+    border: 1px solid var(--border-bright);
+  }
+
+  .btn-secondary:hover { background: var(--bg-card-hover); transform: translateY(-2px); border-color: var(--text-muted); }
+
+  .terminal {
+    background: var(--bg-terminal); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; max-width: 680px;
+    animation: fadeInUp 0.6s ease 0.4s both;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .terminal-bar {
+    background: var(--bg-card); padding: 12px 16px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .terminal-dot.r { background: #ff5f57; }
+  .terminal-dot.y { background: #febc2e; }
+  .terminal-dot.g { background: #28c840; }
+
+  .terminal-title {
+    margin-left: 8px; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--text-muted);
+  }
+
+  .terminal-body {
+    padding: 20px 24px; font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px; line-height: 2;
+  }
+
+  .t-comment { color: var(--text-muted); }
+  .t-prompt { color: var(--accent); }
+  .t-cmd { color: var(--text-primary); }
+  .t-flag { color: var(--blue); }
+  .t-string { color: var(--warning); }
+  .t-success { color: var(--accent); }
+
+  .stats-bar { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  .stats-inner {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  }
+
+  .stat { background: var(--bg-card); padding: 28px 32px; text-align: center; }
+  .stat-number { font-size: 32px; font-weight: 800; color: var(--accent); letter-spacing: -1px; margin-bottom: 4px; }
+  .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+  section { max-width: 1120px; margin: 0 auto; padding: 100px 24px; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+    color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: clamp(28px, 4vw, 42px); font-weight: 800;
+    letter-spacing: -1.5px; line-height: 1.15; margin-bottom: 16px;
+  }
+
+  .section-desc {
+    font-size: 17px; color: var(--text-secondary);
+    max-width: 580px; line-height: 1.7; margin-bottom: 56px;
+  }
+
+  .problem-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+  }
+
+  .problem-card { background: var(--bg-card); padding: 36px 32px; }
+  .problem-card .problem-emoji { font-size: 28px; margin-bottom: 16px; display: block; }
+  .problem-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; color: var(--danger); }
+  .problem-card p { font-size: 14.5px; color: var(--text-secondary); line-height: 1.65; }
+
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+  }
+
+  .feature-card { background: var(--bg-card); padding: 36px 32px; transition: background 0.3s; }
+  .feature-card:hover { background: var(--bg-card-hover); }
+
+  .feature-icon {
+    width: 44px; height: 44px; background: var(--accent-glow);
+    border: 1px solid rgba(34,214,138,0.2); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px; font-size: 20px;
+  }
+
+  .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; }
+  .feature-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.65; }
+
+  .feature-tag {
+    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; padding: 3px 8px;
+    border-radius: 4px; margin-top: 14px; letter-spacing: 0.5px;
+  }
+
+  .tag-free { background: rgba(34,214,138,0.12); color: var(--accent); border: 1px solid rgba(34,214,138,0.2); }
+  .tag-pro { background: rgba(155,122,255,0.12); color: var(--purple); border: 1px solid rgba(155,122,255,0.2); }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+
+  .step-number {
+    font-family: 'JetBrains Mono', monospace; font-size: 64px;
+    font-weight: 800; color: var(--bg-card-hover); line-height: 1; margin-bottom: 16px;
+  }
+
+  .step h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+  .step p { font-size: 14.5px; color: var(--text-secondary); line-height: 1.65; }
+
+  .step code {
+    display: block; margin-top: 16px; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: var(--accent); background: var(--bg-terminal);
+    border: 1px solid var(--border); padding: 12px 16px; border-radius: 8px;
+  }
+
+  .comparison-wrap { overflow-x: auto; }
+  .comparison { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+  .comparison th {
+    text-align: left; padding: 14px 20px; font-weight: 600;
+    color: var(--text-muted); font-size: 12px;
+    text-transform: uppercase; letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .comparison th:first-child { padding-left: 0; }
+  .comparison td { padding: 16px 20px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+  .comparison td:first-child { padding-left: 0; color: var(--text-primary); font-weight: 600; }
+  .comparison .col-lockbox { background: rgba(34,214,138,0.04); color: var(--text-primary); font-weight: 500; }
+  .comparison .col-lockbox-head { background: rgba(34,214,138,0.08); color: var(--accent) !important; }
+  .check { color: var(--accent); }
+  .cross { color: var(--text-muted); }
+  .dead { color: var(--danger); font-style: italic; }
+
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+  }
+
+  .price-card { background: var(--bg-card); padding: 40px 32px; display: flex; flex-direction: column; }
+
+  .price-card.featured { background: var(--bg-card-hover); position: relative; padding-top: 64px; }
+
+  .price-card.featured::before {
+    content: 'COMING SOON'; position: absolute; top: 0; left: 0; right: 0;
+    background: var(--accent); color: var(--bg-primary); text-align: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    font-weight: 700; padding: 6px; letter-spacing: 1.5px;
+  }
+
+  .price-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .price-amount { font-size: 42px; font-weight: 800; letter-spacing: -2px; margin-bottom: 4px; }
+  .price-amount span { font-size: 16px; font-weight: 500; color: var(--text-muted); letter-spacing: 0; }
+  .price-annual { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+
+  .price-features { list-style: none; flex: 1; margin-bottom: 28px; }
+  .price-features li { padding: 8px 0; font-size: 14px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 10px; }
+  .price-features li::before { content: '✓'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+
+  .price-btn {
+    display: block; text-align: center; padding: 14px; border-radius: 10px;
+    font-weight: 700; font-size: 14px; text-decoration: none;
+    transition: all 0.2s; font-family: inherit; cursor: pointer; border: none;
+  }
+
+  .price-btn-free { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-bright); }
+  .price-btn-free:hover { background: var(--bg-primary); border-color: var(--text-muted); }
+  .price-btn-pro { background: var(--accent); color: var(--bg-primary); }
+  .price-btn-pro:hover { background: var(--accent-dim); box-shadow: 0 4px 20px var(--accent-glow); }
+  .price-btn-team { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-bright); }
+  .price-btn-team:hover { background: var(--bg-primary); border-color: var(--text-muted); }
+
+  .waitlist-section { text-align: center; padding: 100px 24px 120px; }
+
+  .waitlist-box {
+    max-width: 520px; margin: 0 auto; background: var(--bg-card);
+    border: 1px solid var(--border-bright); border-radius: 16px;
+    padding: 48px 40px; position: relative; overflow: hidden;
+  }
+
+  .waitlist-box::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .waitlist-box h2 { font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+  .waitlist-box p { color: var(--text-secondary); font-size: 15px; margin-bottom: 28px; line-height: 1.6; }
+  .waitlist-form { display: flex; gap: 10px; }
+
+  .waitlist-input {
+    flex: 1; padding: 14px 18px; background: var(--bg-primary);
+    border: 1px solid var(--border-bright); border-radius: 10px;
+    color: var(--text-primary); font-size: 15px; font-family: inherit; outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .waitlist-input::placeholder { color: var(--text-muted); }
+  .waitlist-input:focus { border-color: var(--accent); }
+
+  .waitlist-submit {
+    padding: 14px 24px; background: var(--accent); color: var(--bg-primary);
+    border: none; border-radius: 10px; font-weight: 700; font-size: 15px;
+    cursor: pointer; font-family: inherit; white-space: nowrap; transition: all 0.2s;
+  }
+
+  .waitlist-submit:hover { background: var(--accent-dim); }
+
+  .waitlist-success { display: none; color: var(--accent); font-weight: 600; margin-top: 16px; font-size: 15px; }
+  .waitlist-count { margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+
+  footer { border-top: 1px solid var(--border); padding: 48px 24px; max-width: 1120px; margin: 0 auto; }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+  .footer-left { display: flex; align-items: center; gap: 24px; }
+  .footer-copy { font-size: 13px; color: var(--text-muted); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--text-secondary); }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-in { opacity: 0; transform: translateY(24px); transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+  .animate-in.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    .nav-links a:not(.nav-cta) { display: none; }
+    .features-grid, .problem-grid { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; gap: 48px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .stats-inner { grid-template-columns: 1fr; }
+    .hero { padding: 120px 24px 60px; }
+    .hero-actions { flex-direction: column; }
+    .btn-primary, .btn-secondary { text-align: center; justify-content: center; }
+    .waitlist-form { flex-direction: column; }
+    .footer-inner { flex-direction: column; text-align: center; }
+    .footer-left { flex-direction: column; }
+    .comparison { font-size: 12px; }
+    .comparison th, .comparison td { padding: 10px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+      </div>
+      <span class="logo-text">lockbox</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#compare">Compare</a>
+      <a href="https://github.com/brenthadfield-wq/lockbox" target="_blank">GitHub</a>
+      <a href="#waitlist" class="nav-cta">Get Early Access</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-grid-bg"></div>
+
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    v1.0 — Free and open source
+  </div>
+
+  <h1>Code with AI<br>without <span class="highlight">leaking<br>your keys.</span></h1>
+
+  <p class="hero-sub">Lockbox keeps your API keys encrypted in one place. Your AI coding tools can use them without ever seeing the actual values. And if your code accidentally hits GitHub? Nothing leaks.</p>
+
+  <div class="hero-actions">
+    <a href="#install" class="btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      Get Started Free
+    </a>
+    <a href="#waitlist" class="btn-secondary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      Join Pro Waitlist
+    </a>
+  </div>
+
+  <div class="terminal" id="install">
+    <div class="terminal-bar">
+      <span class="terminal-dot r"></span>
+      <span class="terminal-dot y"></span>
+      <span class="terminal-dot g"></span>
+      <span class="terminal-title">~/my-project</span>
+    </div>
+    <div class="terminal-body">
+      <span class="t-comment"># Secure your first API key in 30 seconds</span><br>
+      <span class="t-prompt">$</span> <span class="t-cmd">npx lockbox-vault init</span><br>
+      <span class="t-success">✓ Vault created — choose a master password</span><br><br>
+      <span class="t-prompt">$</span> <span class="t-cmd">lockbox add openai API_KEY</span> <span class="t-string">sk-proj-abc...</span><br>
+      <span class="t-success">✓ Stored — encrypted and locked down</span><br><br>
+      <span class="t-comment"># Now your AI tools can use it safely</span><br>
+      <span class="t-prompt">$</span> <span class="t-cmd">lockbox run</span> <span class="t-string">"npm start"</span><br>
+      <span class="t-success">✓ Keys injected at runtime — nothing saved to disk</span>
+    </div>
+  </div>
+</div>
+
+<div class="stats-bar animate-in">
+  <div class="stats-inner">
+    <div class="stat">
+      <div class="stat-number">23.8M</div>
+      <div class="stat-label">API keys and passwords leaked on GitHub last year</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">92%</div>
+      <div class="stat-label">Of developers now use AI tools to write code</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">47%</div>
+      <div class="stat-label">Of AI-generated code has security issues</div>
+    </div>
+  </div>
+</div>
+
+<!-- THE PROBLEM -->
+<section>
+  <div class="section-label">The Problem</div>
+  <h2 class="section-title">Sound familiar?</h2>
+  <p class="section-desc">If you're building with AI tools like Claude Code or Cursor, you've probably hit at least one of these.</p>
+
+  <div class="problem-grid animate-in">
+    <div class="problem-card">
+      <span class="problem-emoji">😱</span>
+      <h3>Accidentally pushed keys to GitHub</h3>
+      <p>You forgot to add .env to .gitignore, or your AI tool committed it for you. Now your OpenAI key is public and someone's running up your bill.</p>
+    </div>
+    <div class="problem-card">
+      <span class="problem-emoji">🗂️</span>
+      <h3>Keys scattered everywhere</h3>
+      <p>Some in .env files, some in browser tabs, some in Slack messages. You've got the same API key in three different projects and can't remember which one is current.</p>
+    </div>
+    <div class="problem-card">
+      <span class="problem-emoji">🤖</span>
+      <h3>AI tools need your keys to work</h3>
+      <p>Claude Code asks for your API key and you paste it right into the chat. Now it's in your conversation history, your clipboard, and who knows where else.</p>
+    </div>
+    <div class="problem-card">
+      <span class="problem-emoji">🔄</span>
+      <h3>Rotating a leaked key is painful</h3>
+      <p>One key gets compromised and you're hunting through every project, every .env file, every config to find where you used it. It takes hours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">The Solution</div>
+  <h2 class="section-title">One vault for all your API keys.<br>Works with your AI tools.</h2>
+  <p class="section-desc">Think of it like a password manager, but built specifically for API keys and designed to work with AI coding tools like Claude Code and Cursor.</p>
+
+  <div class="features-grid animate-in">
+    <div class="feature-card">
+      <div class="feature-icon">🔐</div>
+      <h3>One Password, All Keys</h3>
+      <p>One master password locks everything down. Your keys are encrypted with the same standard used by banks and crypto wallets. Even if someone steals the vault file, they can't read it.</p>
+      <span class="feature-tag tag-free">FREE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>Works with AI Coding Tools</h3>
+      <p>Claude Code, Cursor, and Windsurf can store and retrieve your keys directly — no copy-pasting, no .env files lying around. Just ask your AI tool for the key it needs.</p>
+      <span class="feature-tag tag-free">FREE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛡️</div>
+      <h3>Leak-Proof .env Files</h3>
+      <p>Your .env files contain safe references like <code style="color:var(--accent);background:var(--bg-terminal);padding:2px 6px;border-radius:4px;font-size:12px;">lockbox://openai/KEY</code> instead of real keys. Push to GitHub all day — nothing sensitive is exposed.</p>
+      <span class="feature-tag tag-free">FREE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📋</div>
+      <h3>Know Who Accessed What</h3>
+      <p>Every time a key is used — whether by you or by an AI tool — it's logged. If something goes wrong, you can see exactly what was accessed and when.</p>
+      <span class="feature-tag tag-free">FREE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📦</div>
+      <h3>Import Your Existing Keys</h3>
+      <p>Already have .env files? Import them in one command. Lockbox reads your existing files and stores everything safely. Migration takes seconds, not hours.</p>
+      <span class="feature-tag tag-free">FREE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⏱️</div>
+      <h3>Locks Itself Automatically</h3>
+      <p>Walk away from your computer? Your vault locks itself after 15 minutes. Someone guessing your password? It slows down after a few wrong tries. Copied a key? Clipboard clears itself.</p>
+      <span class="feature-tag tag-free">FREE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">☁️</div>
+      <h3>Sync Across Your Machines</h3>
+      <p>Use your vault on your laptop and your desktop. Everything is encrypted before it ever leaves your machine — we can never see your keys, even on our servers.</p>
+      <span class="feature-tag tag-pro">PRO — COMING SOON</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Visual Dashboard</h3>
+      <p>Manage your keys in a clean web interface instead of the command line. Search, filter by project, build .env files visually, and see your access history at a glance.</p>
+      <span class="feature-tag tag-pro">PRO — COMING SOON</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <h3>Share Keys with Your Team</h3>
+      <p>Create shared vaults for your team. Control who can see which keys. See what your team members are using. No more sharing secrets over Slack or email.</p>
+      <span class="feature-tag tag-pro">TEAM — COMING SOON</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="section-label">How It Works</div>
+  <h2 class="section-title">Three commands. Thirty seconds.</h2>
+  <p class="section-desc">No account to create. No server to set up. No configuration files to edit. Just install, store your key, and start building.</p>
+
+  <div class="steps animate-in">
+    <div class="step">
+      <div class="step-number">01</div>
+      <h3>Create your vault</h3>
+      <p>Pick a master password. That's it. Lockbox creates an encrypted vault on your machine — your keys never leave your computer unless you want them to.</p>
+      <code>$ npx lockbox-vault init</code>
+    </div>
+    <div class="step">
+      <div class="step-number">02</div>
+      <h3>Store your keys</h3>
+      <p>Add your API keys one by one, or import an entire .env file at once. Organise them by project so you always know which keys belong where.</p>
+      <code>$ lockbox add openai API_KEY sk-...</code>
+    </div>
+    <div class="step">
+      <div class="step-number">03</div>
+      <h3>Build safely</h3>
+      <p>Run your app through Lockbox and it injects your real keys only while your app is running. Or let your AI tool pull keys directly. Either way, nothing is saved to disk.</p>
+      <code>$ lockbox run "npm start"</code>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section id="compare">
+  <div class="section-label">Compare</div>
+  <h2 class="section-title">Built for AI coding.<br>Not retrofitted.</h2>
+  <p class="section-desc">Other tools were built for DevOps teams or general password management. Lockbox was built from day one for people who build with AI.</p>
+
+  <div class="comparison-wrap animate-in">
+    <table class="comparison">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th class="col-lockbox-head">Lockbox</th>
+          <th>Doppler</th>
+          <th>Infisical</th>
+          <th>1Password</th>
+          <th>EnvKey</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Works with AI tools</td>
+          <td class="col-lockbox"><span class="check">✓ Built-in</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td class="dead">Shut down</td>
+        </tr>
+        <tr>
+          <td>Leak-proof .env files</td>
+          <td class="col-lockbox"><span class="check">✓ lockbox://</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td class="dead">Shut down</td>
+        </tr>
+        <tr>
+          <td>Works offline</td>
+          <td class="col-lockbox"><span class="check">✓</span></td>
+          <td><span class="cross">✗ Cloud only</span></td>
+          <td><span class="cross">✗ Cloud only</span></td>
+          <td>Partial</td>
+          <td class="dead">Shut down</td>
+        </tr>
+        <tr>
+          <td>Logs AI tool access</td>
+          <td class="col-lockbox"><span class="check">✓ CLI + AI</span></td>
+          <td><span class="cross">✗</span></td>
+          <td>Basic</td>
+          <td><span class="cross">✗</span></td>
+          <td class="dead">Shut down</td>
+        </tr>
+        <tr>
+          <td>Open source</td>
+          <td class="col-lockbox"><span class="check">✓ MIT</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td class="dead">Shut down</td>
+        </tr>
+        <tr>
+          <td>Free tier</td>
+          <td class="col-lockbox"><span class="check">✓ Generous</span></td>
+          <td>Limited</td>
+          <td>Limited</td>
+          <td><span class="cross">Trial only</span></td>
+          <td class="dead">—</td>
+        </tr>
+        <tr>
+          <td>Paid price</td>
+          <td class="col-lockbox"><span class="check">$5/mo</span></td>
+          <td>$7–21/user</td>
+          <td>$8–18/user</td>
+          <td>$3–8/user</td>
+          <td class="dead">—</td>
+        </tr>
+        <tr>
+          <td>Time to get started</td>
+          <td class="col-lockbox"><span class="check">30 seconds</span></td>
+          <td>15+ minutes</td>
+          <td>10+ minutes</td>
+          <td>5+ minutes</td>
+          <td class="dead">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-title">Free to start. Cheap to grow.</h2>
+  <p class="section-desc">Everything you need to keep your API keys safe is free. Pro adds convenience features like sync, a visual dashboard, and team sharing when you're ready.</p>
+
+  <div class="pricing-grid animate-in">
+    <div class="price-card">
+      <div class="price-name">Free</div>
+      <div class="price-amount">$0 <span>forever</span></div>
+      <div class="price-annual">No credit card needed</div>
+      <ul class="price-features">
+        <li>Encrypted vault on your machine</li>
+        <li>Works with Claude Code, Cursor & more</li>
+        <li>Leak-proof .env proxy system</li>
+        <li>Access logs for every key</li>
+        <li>Import existing .env files</li>
+        <li>Auto-lock & brute-force protection</li>
+        <li>16 CLI commands</li>
+        <li>Open source (MIT licence)</li>
+      </ul>
+      <a href="#install" class="price-btn price-btn-free">Install Now — 30 Seconds</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-name">Pro</div>
+      <div class="price-amount">$5 <span>/month</span></div>
+      <div class="price-annual">or $48/year (save 20%)</div>
+      <ul class="price-features">
+        <li>Everything in Free</li>
+        <li>Unlimited vaults & keys</li>
+        <li>Sync across all your machines</li>
+        <li>Visual web dashboard</li>
+        <li>Browser extension</li>
+        <li>Key expiry reminders</li>
+        <li>Organise keys by project</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="#waitlist" class="price-btn price-btn-pro">Join Pro Waitlist</a>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Team</div>
+      <div class="price-amount">$5 <span>/user/mo</span></div>
+      <div class="price-annual">Minimum 2 users</div>
+      <ul class="price-features">
+        <li>Everything in Pro</li>
+        <li>Shared team vaults</li>
+        <li>Control who sees which keys</li>
+        <li>Team access logs</li>
+        <li>Easy team onboarding</li>
+        <li>Up to 20 users</li>
+      </ul>
+      <a href="#waitlist" class="price-btn price-btn-team">Join Team Waitlist</a>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section class="waitlist-section" id="waitlist">
+  <div class="waitlist-box animate-in">
+    <h2>Be first to get Pro.</h2>
+    <p>We're building sync, the visual dashboard, and team features based on what our users want most. Join the waitlist to help shape what comes next — and get early access when it's ready.</p>
+    <form class="waitlist-form" id="waitlistForm">
+      <input type="email" class="waitlist-input" placeholder="you@email.com" required id="waitlistEmail">
+      <button type="submit" class="waitlist-submit">Join Waitlist</button>
+    </form>
+    <div class="waitlist-success" id="waitlistSuccess">✓ You're on the list! We'll be in touch.</div>
+    <div class="waitlist-count">The free version is ready right now — <a href="#install" style="color:var(--accent);text-decoration:none;">install in 30 seconds</a></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <a href="#" class="logo" style="text-decoration:none;">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+        </div>
+        <span class="logo-text">lockbox</span>
+      </a>
+      <span class="footer-copy">© 2026 Lockbox. MIT Licensed.</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/brenthadfield-wq/lockbox" target="_blank">GitHub</a>
+      <a href="https://www.npmjs.com/package/lockbox-vault" target="_blank">npm</a>
+      <a href="/cdn-cgi/l/email-protection#94e7e1e4e4fbe6e0d4edfbe1e6f8fbf7fff6fbecbaf0f1e2">Support</a>
+      <a href="#">Docs</a>
+      <a href="#">Security</a>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
+
+  document.getElementById('waitlistForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('waitlistEmail').value;
+    // TODO: Wire to Formspree, Resend, or your backend
+    console.log('Waitlist si
