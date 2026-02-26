@@ -41,7 +41,7 @@
     font-family: 'Outfit', sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
-    line-height: 1.6;
+    line-height: 1.5;
     overflow-x: hidden;
   }
 
@@ -223,11 +223,11 @@
     border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
   }
 
-  .stat { background: var(--bg-card); padding: 28px 32px; text-align: center; }
-  .stat-number { font-size: 32px; font-weight: 800; color: var(--accent); letter-spacing: -1px; margin-bottom: 4px; }
-  .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .stat { background: var(--bg-card); padding: 22px 28px; text-align: center; }
+  .stat-number { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -1px; margin-bottom: 2px; }
+  .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-  section { max-width: 1120px; margin: 0 auto; padding: 100px 24px; }
+  section { max-width: 1120px; margin: 0 auto; padding: 80px 24px; }
 
   .section-label {
     font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
@@ -241,7 +241,7 @@
 
   .section-desc {
     font-size: 17px; color: var(--text-secondary);
-    max-width: 580px; line-height: 1.7; margin-bottom: 56px;
+    max-width: 580px; line-height: 1.6; margin-bottom: 40px;
   }
 
   .problem-grid {
@@ -250,10 +250,10 @@
     border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
   }
 
-  .problem-card { background: var(--bg-card); padding: 36px 32px; }
-  .problem-card .problem-emoji { font-size: 28px; margin-bottom: 16px; display: block; }
-  .problem-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; color: var(--danger); }
-  .problem-card p { font-size: 14.5px; color: var(--text-secondary); line-height: 1.65; }
+  .problem-card { background: var(--bg-card); padding: 28px 26px; }
+  .problem-card .problem-emoji { font-size: 24px; margin-bottom: 12px; display: block; }
+  .problem-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--danger); }
+  .problem-card p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.55; }
 
   .features-grid {
     display: grid; grid-template-columns: repeat(3, 1fr);
@@ -261,18 +261,18 @@
     border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
   }
 
-  .feature-card { background: var(--bg-card); padding: 36px 32px; transition: background 0.3s; }
+  .feature-card { background: var(--bg-card); padding: 28px 26px; transition: background 0.3s; }
   .feature-card:hover { background: var(--bg-card-hover); }
 
   .feature-icon {
-    width: 44px; height: 44px; background: var(--accent-glow);
+    width: 40px; height: 40px; background: var(--accent-glow);
     border: 1px solid rgba(34,214,138,0.2); border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    margin-bottom: 20px; font-size: 20px;
+    margin-bottom: 14px; font-size: 18px;
   }
 
-  .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; }
-  .feature-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.65; }
+  .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.3px; }
+  .feature-card p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.55; }
 
   .feature-tag {
     display: inline-block; font-family: 'JetBrains Mono', monospace;
@@ -286,12 +286,12 @@
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
 
   .step-number {
-    font-family: 'JetBrains Mono', monospace; font-size: 64px;
-    font-weight: 800; color: var(--bg-card-hover); line-height: 1; margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 56px;
+    font-weight: 800; color: var(--bg-card-hover); line-height: 1; margin-bottom: 12px;
   }
 
-  .step h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-  .step p { font-size: 14.5px; color: var(--text-secondary); line-height: 1.65; }
+  .step h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .step p { font-size: 14px; color: var(--text-secondary); line-height: 1.55; }
 
   .step code {
     display: block; margin-top: 16px; font-family: 'JetBrains Mono', monospace;
@@ -303,14 +303,14 @@
   .comparison { width: 100%; border-collapse: collapse; font-size: 14px; }
 
   .comparison th {
-    text-align: left; padding: 14px 20px; font-weight: 600;
-    color: var(--text-muted); font-size: 12px;
+    text-align: left; padding: 12px 16px; font-weight: 600;
+    color: var(--text-muted); font-size: 11px;
     text-transform: uppercase; letter-spacing: 1px;
     border-bottom: 1px solid var(--border);
   }
 
   .comparison th:first-child { padding-left: 0; }
-  .comparison td { padding: 16px 20px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+  .comparison td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-secondary); font-size: 13px; }
   .comparison td:first-child { padding-left: 0; color: var(--text-primary); font-weight: 600; }
   .comparison .col-lockbox { background: rgba(34,214,138,0.04); color: var(--text-primary); font-weight: 500; }
   .comparison .col-lockbox-head { background: rgba(34,214,138,0.08); color: var(--accent) !important; }
@@ -324,9 +324,9 @@
     border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
   }
 
-  .price-card { background: var(--bg-card); padding: 40px 32px; display: flex; flex-direction: column; }
+  .price-card { background: var(--bg-card); padding: 32px 28px; display: flex; flex-direction: column; }
 
-  .price-card.featured { background: var(--bg-card-hover); position: relative; padding-top: 64px; }
+  .price-card.featured { background: var(--bg-card-hover); position: relative; padding-top: 52px; }
 
   .price-card.featured::before {
     content: 'COMING SOON'; position: absolute; top: 0; left: 0; right: 0;
@@ -336,12 +336,12 @@
   }
 
   .price-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-  .price-amount { font-size: 42px; font-weight: 800; letter-spacing: -2px; margin-bottom: 4px; }
-  .price-amount span { font-size: 16px; font-weight: 500; color: var(--text-muted); letter-spacing: 0; }
-  .price-annual { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+  .price-amount { font-size: 38px; font-weight: 800; letter-spacing: -2px; margin-bottom: 2px; }
+  .price-amount span { font-size: 15px; font-weight: 500; color: var(--text-muted); letter-spacing: 0; }
+  .price-annual { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; }
 
   .price-features { list-style: none; flex: 1; margin-bottom: 28px; }
-  .price-features li { padding: 8px 0; font-size: 14px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 10px; }
+  .price-features li { padding: 5px 0; font-size: 14px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 10px; line-height: 1.4; }
   .price-features li::before { content: '✓'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
 
   .price-btn {
@@ -357,12 +357,12 @@
   .price-btn-team { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-bright); }
   .price-btn-team:hover { background: var(--bg-primary); border-color: var(--text-muted); }
 
-  .waitlist-section { text-align: center; padding: 100px 24px 120px; }
+  .waitlist-section { text-align: center; padding: 60px 24px 80px; }
 
   .waitlist-box {
     max-width: 520px; margin: 0 auto; background: var(--bg-card);
     border: 1px solid var(--border-bright); border-radius: 16px;
-    padding: 48px 40px; position: relative; overflow: hidden;
+    padding: 36px 32px; position: relative; overflow: hidden;
   }
 
   .waitlist-box::before {
@@ -370,8 +370,8 @@
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
   }
 
-  .waitlist-box h2 { font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
-  .waitlist-box p { color: var(--text-secondary); font-size: 15px; margin-bottom: 28px; line-height: 1.6; }
+  .waitlist-box h2 { font-size: 26px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+  .waitlist-box p { color: var(--text-secondary); font-size: 14.5px; margin-bottom: 22px; line-height: 1.55; }
   .waitlist-form { display: flex; gap: 10px; }
 
   .waitlist-input {
@@ -779,8 +779,9 @@
   <div class="waitlist-box animate-in">
     <h2>Be first to get Pro.</h2>
     <p>We're building sync, the visual dashboard, and team features based on what our users want most. Join the waitlist to help shape what comes next — and get early access when it's ready.</p>
-    <form class="waitlist-form" id="waitlistForm">
-      <input type="email" class="waitlist-input" placeholder="you@email.com" required id="waitlistEmail">
+    <form class="waitlist-form" id="waitlistForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <input type="email" name="email" class="waitlist-input" placeholder="you@email.com" required id="waitlistEmail">
+      <input type="hidden" name="_subject" value="New Lockbox Pro Waitlist Signup">
       <button type="submit" class="waitlist-submit">Join Waitlist</button>
     </form>
     <div class="waitlist-success" id="waitlistSuccess">✓ You're on the list! We'll be in touch.</div>
@@ -802,21 +803,45 @@
     <div class="footer-links">
       <a href="https://github.com/brenthadfield-wq/lockbox" target="_blank">GitHub</a>
       <a href="https://www.npmjs.com/package/lockbox-vault" target="_blank">npm</a>
-      <a href="/cdn-cgi/l/email-protection#94e7e1e4e4fbe6e0d4edfbe1e6f8fbf7fff6fbecbaf0f1e2">Support</a>
+      <a href="mailto:brent@fitnessnation.au">Support</a>
       <a href="#">Docs</a>
       <a href="#">Security</a>
     </div>
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
   }, { threshold: 0.1 });
   document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
 
-  document.getElementById('waitlistForm').addEventListener('submit', function(e) {
+  document.getElementById('waitlistForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const email = document.getElementById('waitlistEmail').value;
-    // TODO: Wire to Formspree, Resend, or your backend
-    console.log('Waitlist si
+    const btn = this.querySelector('.waitlist-submit');
+    const origText = btn.textContent;
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(this.action, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, _subject: 'New Lockbox Pro Waitlist Signup' })
+      });
+      if (res.ok) {
+        this.style.display = 'none';
+        document.getElementById('waitlistSuccess').style.display = 'block';
+      } else {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+      }
+    } catch (err) {
+      btn.textContent = 'Try again';
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
