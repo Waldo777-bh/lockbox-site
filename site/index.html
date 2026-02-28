@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  html { scroll-behavior: smooth; }
   :root {
     --bg-primary: #0a0c10;
     --bg-secondary: #0f1218;
@@ -219,6 +220,18 @@
     margin-left: 8px; font-family: 'JetBrains Mono', monospace;
     font-size: 12px; color: var(--text-muted);
   }
+
+  .terminal-bar { position: relative; }
+
+  .terminal-copy {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: transparent; border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text-muted); padding: 5px 10px; font-size: 11px;
+    font-family: 'Outfit', sans-serif; cursor: pointer; display: flex;
+    align-items: center; gap: 5px; transition: all 0.2s;
+  }
+  .terminal-copy:hover { border-color: var(--accent); color: var(--accent); }
+  .terminal-copy.copied { border-color: var(--accent); color: var(--accent); }
 
   .terminal-body {
     padding: 20px 24px; font-family: 'JetBrains Mono', monospace;
@@ -489,7 +502,7 @@
   <p class="hero-sub">Lockbox keeps your API keys encrypted in one place. Your AI coding tools can use them without ever seeing the actual values. And if your code accidentally hits GitHub? Nothing leaks.</p>
 
   <div class="hero-actions">
-    <a href="https://www.npmjs.com/package/lockbox-vault" target="_blank" class="btn-primary">
+    <a href="#install" class="btn-primary">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       Get Started Free
     </a>
@@ -509,6 +522,10 @@
       <span class="terminal-dot y"></span>
       <span class="terminal-dot g"></span>
       <span class="terminal-title">~/my-project</span>
+      <button class="terminal-copy" onclick="copyInstall(this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy
+      </button>
     </div>
     <div class="terminal-body">
       <span class="t-comment"># Secure your first API key in 30 seconds</span><br>
@@ -772,7 +789,7 @@
         <li>Auto-lock & brute-force protection</li>
         <li>Open source (MIT licence)</li>
       </ul>
-      <a href="https://www.npmjs.com/package/lockbox-vault" target="_blank" class="price-btn price-btn-free">Install Now — 30 Seconds</a>
+      <a href="#install" class="price-btn price-btn-free">Install Now — 30 Seconds</a>
     </div>
     <div class="price-card featured">
       <div class="price-name">Pro</div>
@@ -845,6 +862,17 @@
 </footer>
 
 <script>
+  function copyInstall(btn) {
+    navigator.clipboard.writeText('npm install -g lockbox-vault').then(() => {
+      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
   }, { threshold: 0.1 });
