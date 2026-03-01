@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lockbox — Stop leaking API keys when building with AI</title>
-<meta name="description" content="One password keeps all your API keys safe. Works with Claude Code, Cursor, and any AI coding tool. Free and open source.">
-<meta property="og:title" content="Lockbox — Stop leaking API keys when building with AI">
-<meta property="og:description" content="One password keeps all your API keys safe. Works with Claude Code, Cursor, and any AI coding tool. Free and open source.">
+<title>Lockbox — The crypto wallet for your API keys</title>
+<meta name="description" content="One extension. One password. All your API keys encrypted and ready when you need them. Works with Claude Code, Cursor, and any AI coding tool.">
+<meta property="og:title" content="Lockbox — The crypto wallet for your API keys">
+<meta property="og:description" content="One extension. One password. All your API keys encrypted and ready when you need them. Works with Claude Code, Cursor, and any AI coding tool.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://yourlockbox.dev">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,28 +15,28 @@
 <style>
   html { scroll-behavior: smooth; }
   :root {
-    --bg-primary: #0a0c10;
+    --bg-primary: #0f0f14;
     --bg-secondary: #0f1218;
-    --bg-card: #141820;
-    --bg-card-hover: #1a1f2a;
+    --bg-card: #1a1a24;
+    --bg-card-hover: #222230;
     --bg-terminal: #0c0e14;
-    --border: #1e2432;
-    --border-bright: #2a3142;
+    --border: #2a2a3a;
+    --border-bright: #3a3a4a;
     --text-primary: #e8eaf0;
     --text-secondary: #8b92a5;
     --text-muted: #5a6178;
-    --accent: #22d68a;
-    --accent-dim: #1aad6f;
-    --accent-glow: rgba(34, 214, 138, 0.15);
-    --accent-glow-strong: rgba(34, 214, 138, 0.25);
+    --accent: #00d87a;
+    --accent-dim: #00b368;
+    --accent-glow: rgba(0, 216, 122, 0.15);
+    --accent-glow-strong: rgba(0, 216, 122, 0.25);
     --warning: #f0a744;
     --danger: #e8485c;
     --blue: #4a9eff;
     --purple: #9b7aff;
+    --pro: #FFD700;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
 
   body {
     font-family: 'Outfit', sans-serif;
@@ -58,7 +58,7 @@
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     padding: 16px 0;
-    background: rgba(10, 12, 16, 0.85);
+    background: rgba(15, 15, 20, 0.85);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
   }
@@ -96,12 +96,15 @@
   .nav-cta {
     background: var(--accent) !important; color: var(--bg-primary) !important;
     padding: 8px 18px; border-radius: 8px; font-weight: 600 !important; transition: all 0.2s !important;
+    display: inline-flex !important; align-items: center; gap: 6px;
   }
 
   .nav-cta:hover {
     background: var(--accent-dim) !important;
     transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow);
   }
+
+  .nav-cta svg { width: 14px; height: 14px; }
 
   .nav-login {
     border: 1px solid var(--border-bright) !important; color: var(--text-secondary) !important;
@@ -127,7 +130,7 @@
   .hero-grid-bg {
     position: absolute; top: 0; left: 50%; transform: translateX(-50%);
     width: 120%; height: 100%;
-    background-image: linear-gradient(rgba(34,214,138,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(34,214,138,0.03) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(0,216,122,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,216,122,0.03) 1px, transparent 1px);
     background-size: 60px 60px;
     mask-image: radial-gradient(ellipse 60% 50% at 50% 30%, black 20%, transparent 70%);
     pointer-events: none;
@@ -169,8 +172,19 @@
   }
 
   .hero-actions {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    margin-bottom: 64px; animation: fadeInUp 0.6s ease 0.3s both;
+    display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 20px; animation: fadeInUp 0.6s ease 0.3s both;
+  }
+
+  .hero-cli-hint {
+    font-size: 14px; color: var(--text-muted); margin-bottom: 64px;
+    animation: fadeInUp 0.6s ease 0.35s both;
+  }
+
+  .hero-cli-hint code {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    color: var(--accent); background: var(--bg-card);
+    border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px;
   }
 
   .btn-primary {
@@ -198,52 +212,93 @@
 
   .btn-secondary:hover { background: var(--bg-card-hover); transform: translateY(-2px); border-color: var(--text-muted); }
 
-  .terminal {
-    background: var(--bg-terminal); border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden; max-width: 680px;
+  .wallet-visual {
+    max-width: 680px;
     animation: fadeInUp 0.6s ease 0.4s both;
+  }
+
+  .wallet-mockup {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,0.4);
   }
 
-  .terminal-bar {
-    background: var(--bg-card); padding: 12px 16px;
-    display: flex; align-items: center; gap: 8px;
+  .wallet-header {
+    background: var(--bg-card-hover); padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
     border-bottom: 1px solid var(--border);
   }
 
-  .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
-  .terminal-dot.r { background: #ff5f57; }
-  .terminal-dot.y { background: #febc2e; }
-  .terminal-dot.g { background: #28c840; }
+  .wallet-header-left { display: flex; align-items: center; gap: 10px; }
 
-  .terminal-title {
-    margin-left: 8px; font-family: 'JetBrains Mono', monospace;
-    font-size: 12px; color: var(--text-muted);
+  .wallet-lock-icon {
+    width: 28px; height: 28px; background: var(--accent);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
   }
 
-  .terminal-bar { position: relative; }
+  .wallet-lock-icon svg { width: 14px; height: 14px; fill: var(--bg-primary); }
 
-  .terminal-copy {
-    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    background: transparent; border: 1px solid var(--border); border-radius: 6px;
-    color: var(--text-muted); padding: 5px 10px; font-size: 11px;
-    font-family: 'Outfit', sans-serif; cursor: pointer; display: flex;
-    align-items: center; gap: 5px; transition: all 0.2s;
-  }
-  .terminal-copy:hover { border-color: var(--accent); color: var(--accent); }
-  .terminal-copy.copied { border-color: var(--accent); color: var(--accent); }
-
-  .terminal-body {
-    padding: 20px 24px; font-family: 'JetBrains Mono', monospace;
-    font-size: 13.5px; line-height: 2;
+  .wallet-header-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
   }
 
-  .t-comment { color: var(--text-muted); }
-  .t-prompt { color: var(--accent); }
-  .t-cmd { color: var(--text-primary); }
-  .t-flag { color: var(--blue); }
-  .t-string { color: var(--warning); }
-  .t-success { color: var(--accent); }
+  .wallet-status {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--accent); font-weight: 600;
+  }
+
+  .wallet-status-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+
+  .wallet-body { padding: 24px 20px; }
+
+  .wallet-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .wallet-stat {
+    background: var(--bg-primary); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 12px; text-align: center;
+  }
+
+  .wallet-stat-number {
+    font-size: 24px; font-weight: 800; color: var(--accent);
+    letter-spacing: -1px; margin-bottom: 2px;
+  }
+
+  .wallet-stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+  .wallet-keys { display: flex; flex-direction: column; gap: 8px; }
+
+  .wallet-key {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg-primary); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+  }
+
+  .wallet-key-left { display: flex; align-items: center; gap: 12px; }
+
+  .wallet-key-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+  }
+
+  .wallet-key-icon.openai { background: rgba(74, 158, 255, 0.12); color: var(--blue); }
+  .wallet-key-icon.anthropic { background: rgba(155, 122, 255, 0.12); color: var(--purple); }
+  .wallet-key-icon.stripe { background: rgba(0, 216, 122, 0.12); color: var(--accent); }
+
+  .wallet-key-name {
+    font-size: 13px; font-weight: 600; color: var(--text-primary);
+  }
+
+  .wallet-key-service { font-size: 11px; color: var(--text-muted); }
+
+  .wallet-key-encrypted {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-muted); letter-spacing: 1px;
+  }
 
   .stats-bar { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
@@ -296,7 +351,7 @@
 
   .feature-icon {
     width: 40px; height: 40px; background: var(--accent-glow);
-    border: 1px solid rgba(34,214,138,0.2); border-radius: 10px;
+    border: 1px solid rgba(0,216,122,0.2); border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 14px; font-size: 18px;
   }
@@ -310,10 +365,14 @@
     border-radius: 4px; margin-top: 14px; letter-spacing: 0.5px;
   }
 
-  .tag-free { background: rgba(34,214,138,0.12); color: var(--accent); border: 1px solid rgba(34,214,138,0.2); }
+  .tag-free { background: rgba(0,216,122,0.12); color: var(--accent); border: 1px solid rgba(0,216,122,0.2); }
   .tag-pro { background: rgba(155,122,255,0.12); color: var(--purple); border: 1px solid rgba(155,122,255,0.2); }
 
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+
+  .step {
+    display: flex; flex-direction: column;
+  }
 
   .step-number {
     font-family: 'JetBrains Mono', monospace; font-size: 56px;
@@ -321,13 +380,21 @@
   }
 
   .step h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
-  .step p { font-size: 14px; color: var(--text-secondary); line-height: 1.55; }
+  .step p { font-size: 14px; color: var(--text-secondary); line-height: 1.55; flex: 1; }
 
   .step code {
     display: block; margin-top: 16px; font-family: 'JetBrains Mono', monospace;
-    font-size: 13px; color: var(--accent); background: var(--bg-terminal);
+    font-size: 13px; color: var(--accent); background: var(--bg-primary);
     border: 1px solid var(--border); padding: 12px 16px; border-radius: 8px;
   }
+
+  .step .step-visual {
+    margin-top: 16px; font-size: 13px; color: var(--text-muted);
+    background: var(--bg-primary); border: 1px solid var(--border);
+    padding: 12px 16px; border-radius: 8px; line-height: 1.6;
+  }
+
+  .step .step-visual .sv-accent { color: var(--accent); font-weight: 600; }
 
   .comparison-wrap { overflow-x: auto; }
   .comparison { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -342,8 +409,8 @@
   .comparison th:first-child { padding-left: 0; }
   .comparison td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-secondary); font-size: 13px; }
   .comparison td:first-child { padding-left: 0; color: var(--text-primary); font-weight: 600; }
-  .comparison .col-lockbox { background: rgba(34,214,138,0.04); color: var(--text-primary); font-weight: 500; }
-  .comparison .col-lockbox-head { background: rgba(34,214,138,0.08); color: var(--accent) !important; }
+  .comparison .col-lockbox { background: rgba(0,216,122,0.04); color: var(--text-primary); font-weight: 500; }
+  .comparison .col-lockbox-head { background: rgba(0,216,122,0.08); color: var(--accent) !important; }
   .check { color: var(--accent); }
   .cross { color: var(--text-muted); }
   .dead { color: var(--danger); font-style: italic; }
@@ -381,7 +448,7 @@
 
   .price-features { list-style: none; flex: 1; margin-bottom: 28px; }
   .price-features li { padding: 5px 0; font-size: 14px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 10px; line-height: 1.4; }
-  .price-features li::before { content: '✓'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+  .price-features li::before { content: '\2713'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
 
   .price-btn {
     display: block; text-align: center; padding: 14px; border-radius: 10px;
@@ -396,49 +463,35 @@
   .price-btn-team { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-bright); }
   .price-btn-team:hover { background: var(--bg-primary); border-color: var(--text-muted); }
 
-  .waitlist-section { text-align: center; padding: 60px 24px 80px; }
+  .cta-section { text-align: center; padding: 60px 24px 80px; }
 
-  .waitlist-box {
+  .cta-box {
     max-width: 520px; margin: 0 auto; background: var(--bg-card);
     border: 1px solid var(--border-bright); border-radius: 16px;
     padding: 36px 32px; position: relative; overflow: hidden;
   }
 
-  .waitlist-box::before {
+  .cta-box::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
   }
 
-  .waitlist-box h2 { font-size: 26px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
-  .waitlist-box p { color: var(--text-secondary); font-size: 14.5px; margin-bottom: 22px; line-height: 1.55; }
-  .waitlist-form { display: flex; gap: 10px; }
+  .cta-box h2 { font-size: 26px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+  .cta-box p { color: var(--text-secondary); font-size: 14.5px; margin-bottom: 22px; line-height: 1.55; }
 
-  .waitlist-input {
-    flex: 1; padding: 14px 18px; background: var(--bg-primary);
-    border: 1px solid var(--border-bright); border-radius: 10px;
-    color: var(--text-primary); font-size: 15px; font-family: inherit; outline: none;
-    transition: border-color 0.2s;
-  }
+  .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-  .waitlist-input::placeholder { color: var(--text-muted); }
-  .waitlist-input:focus { border-color: var(--accent); }
-
-  .waitlist-submit {
-    padding: 14px 24px; background: var(--accent); color: var(--bg-primary);
-    border: none; border-radius: 10px; font-weight: 700; font-size: 15px;
-    cursor: pointer; font-family: inherit; white-space: nowrap; transition: all 0.2s;
-  }
-
-  .waitlist-submit:hover { background: var(--accent-dim); }
-
-  .waitlist-success { display: none; color: var(--accent); font-weight: 600; margin-top: 16px; font-size: 15px; }
-  .waitlist-count { margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+  .cta-alt { margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+  .cta-alt a { color: var(--accent); text-decoration: none; }
+  .cta-alt a:hover { text-decoration: underline; }
 
   footer { border-top: 1px solid var(--border); padding: 48px 24px; max-width: 1120px; margin: 0 auto; }
   .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
-  .footer-left { display: flex; align-items: center; gap: 24px; }
+  .footer-left { display: flex; flex-direction: column; gap: 8px; }
+  .footer-brand { display: flex; align-items: center; gap: 24px; }
   .footer-copy { font-size: 13px; color: var(--text-muted); }
-  .footer-links { display: flex; gap: 24px; }
+  .footer-tagline { font-size: 12px; color: var(--text-muted); font-style: italic; }
+  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
   .footer-links a { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
   .footer-links a:hover { color: var(--text-secondary); }
 
@@ -459,11 +512,14 @@
     .hero { padding: 120px 24px 60px; }
     .hero-actions { flex-direction: column; }
     .btn-primary, .btn-secondary { text-align: center; justify-content: center; }
-    .waitlist-form { flex-direction: column; }
+    .cta-buttons { flex-direction: column; }
     .footer-inner { flex-direction: column; text-align: center; }
-    .footer-left { flex-direction: column; }
+    .footer-left { align-items: center; }
+    .footer-brand { flex-direction: column; }
+    .footer-links { justify-content: center; }
     .comparison { font-size: 12px; }
     .comparison th, .comparison td { padding: 10px 12px; }
+    .wallet-stats { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -483,8 +539,11 @@
       <a href="#compare">Compare</a>
       <a href="https://dashboard.yourlockbox.dev" target="_blank">Dashboard</a>
       <a href="https://github.com/Waldo777-bh/lockbox" target="_blank">GitHub</a>
-      <a href="https://dashboard.yourlockbox.dev" target="_blank" class="nav-login">Log In</a>
-      <a href="#waitlist" class="nav-cta">Get Early Access</a>
+      <a href="https://dashboard.yourlockbox.dev" target="_blank" class="nav-login">Open Dashboard</a>
+      <a href="https://github.com/Waldo777-bh/lockbox/releases/latest" target="_blank" class="nav-cta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Install Extension
+      </a>
     </div>
   </div>
 </nav>
@@ -494,48 +553,89 @@
 
   <div class="hero-badge">
     <span class="hero-badge-dot"></span>
-    v1.1 — Free tier + Pro available
+    v2.0 — Wallet Edition
   </div>
 
-  <h1>Code with AI<br>without <span class="highlight">leaking<br>your keys.</span></h1>
+  <h1>The <span class="highlight">crypto wallet</span><br>for your API keys.</h1>
 
-  <p class="hero-sub">Lockbox keeps your API keys encrypted in one place. Your AI coding tools can use them without ever seeing the actual values. And if your code accidentally hits GitHub? Nothing leaks.</p>
+  <p class="hero-sub">One extension. One password. All your API keys encrypted and ready when you need them. Auto-detects keys across 20+ platforms and fills them in one click.</p>
 
   <div class="hero-actions">
-    <a href="#install" class="btn-primary">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-      Get Started Free
+    <a href="https://github.com/Waldo777-bh/lockbox/releases/latest" target="_blank" class="btn-primary" id="installBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Install Lockbox Wallet
     </a>
     <a href="https://dashboard.yourlockbox.dev" target="_blank" class="btn-secondary">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Open Dashboard
     </a>
-    <a href="https://dashboard.yourlockbox.dev/dashboard/pricing" target="_blank" class="btn-secondary">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-      Upgrade to Pro
-    </a>
   </div>
 
-  <div class="terminal" id="install">
-    <div class="terminal-bar">
-      <span class="terminal-dot r"></span>
-      <span class="terminal-dot y"></span>
-      <span class="terminal-dot g"></span>
-      <span class="terminal-title">~/my-project</span>
-      <button class="terminal-copy" onclick="copyInstall(this)">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-        Copy
-      </button>
-    </div>
-    <div class="terminal-body">
-      <span class="t-comment"># Secure your first API key in 30 seconds</span><br>
-      <span class="t-prompt">$</span> <span class="t-cmd">npm install -g lockbox-vault</span><br>
-      <span class="t-success">✓ Vault created — choose a master password</span><br><br>
-      <span class="t-prompt">$</span> <span class="t-cmd">lockbox add openai API_KEY</span> <span class="t-string">sk-proj-abc...</span><br>
-      <span class="t-success">✓ Stored — encrypted and locked down</span><br><br>
-      <span class="t-comment"># Now your AI tools can use it safely</span><br>
-      <span class="t-prompt">$</span> <span class="t-cmd">lockbox run</span> <span class="t-string">"npm start"</span><br>
-      <span class="t-success">✓ Keys injected at runtime — nothing saved to disk</span>
+  <p class="hero-cli-hint">Or install via CLI: <code>npm install -g lockbox-vault</code></p>
+
+  <!-- Wallet Visual -->
+  <div class="wallet-visual">
+    <div class="wallet-mockup">
+      <div class="wallet-header">
+        <div class="wallet-header-left">
+          <div class="wallet-lock-icon">
+            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+          </div>
+          <span class="wallet-header-title">Lockbox Wallet</span>
+        </div>
+        <div class="wallet-status">
+          <span class="wallet-status-dot"></span>
+          Unlocked
+        </div>
+      </div>
+      <div class="wallet-body">
+        <div class="wallet-stats">
+          <div class="wallet-stat">
+            <div class="wallet-stat-number">12</div>
+            <div class="wallet-stat-label">Keys Secured</div>
+          </div>
+          <div class="wallet-stat">
+            <div class="wallet-stat-number">3</div>
+            <div class="wallet-stat-label">Vaults</div>
+          </div>
+          <div class="wallet-stat">
+            <div class="wallet-stat-number">8</div>
+            <div class="wallet-stat-label">Services</div>
+          </div>
+        </div>
+        <div class="wallet-keys">
+          <div class="wallet-key">
+            <div class="wallet-key-left">
+              <div class="wallet-key-icon openai">AI</div>
+              <div>
+                <div class="wallet-key-name">OPENAI_API_KEY</div>
+                <div class="wallet-key-service">OpenAI</div>
+              </div>
+            </div>
+            <div class="wallet-key-encrypted">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+          </div>
+          <div class="wallet-key">
+            <div class="wallet-key-left">
+              <div class="wallet-key-icon anthropic">An</div>
+              <div>
+                <div class="wallet-key-name">ANTHROPIC_API_KEY</div>
+                <div class="wallet-key-service">Anthropic</div>
+              </div>
+            </div>
+            <div class="wallet-key-encrypted">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+          </div>
+          <div class="wallet-key">
+            <div class="wallet-key-left">
+              <div class="wallet-key-icon stripe">$</div>
+              <div>
+                <div class="wallet-key-name">STRIPE_SECRET_KEY</div>
+                <div class="wallet-key-service">Stripe</div>
+              </div>
+            </div>
+            <div class="wallet-key-encrypted">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -590,64 +690,46 @@
 <!-- FEATURES -->
 <section id="features">
   <div class="section-label">The Solution</div>
-  <h2 class="section-title">One vault for all your API keys.<br>Works with your AI tools.</h2>
-  <p class="section-desc">Think of it like a password manager, but built specifically for API keys and designed to work with AI coding tools like Claude Code and Cursor.</p>
+  <h2 class="section-title">Your keys, encrypted in your browser.<br>Ready when you need them.</h2>
+  <p class="section-desc">Lockbox is a MetaMask-style wallet built for API keys. Everything is encrypted locally with AES-256-GCM. Your keys never leave your device unencrypted.</p>
 
   <div class="features-grid animate-in">
     <div class="feature-card">
+      <div class="feature-icon">🔍</div>
+      <h3>Auto-Detect &amp; Auto-Fill</h3>
+      <p>Lockbox detects API key fields on 20+ platforms including OpenAI, Anthropic, Stripe, AWS, and more. One click to fill — no more copy-pasting from text files.</p>
+      <span class="feature-tag tag-free">FREE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📸</div>
+      <h3>One-Click Capture</h3>
+      <p>When a platform shows you a new API key, Lockbox detects it and offers to save it instantly. Keys go straight into your encrypted vault the moment they appear.</p>
+      <span class="feature-tag tag-free">FREE</span>
+    </div>
+    <div class="feature-card">
       <div class="feature-icon">🔐</div>
-      <h3>One Password, All Keys</h3>
-      <p>One master password locks everything down. Your keys are encrypted with the same standard used by banks and crypto wallets. Even if someone steals the vault file, they can't read it.</p>
+      <h3>Encrypted Locally</h3>
+      <p>AES-256-GCM encryption with PBKDF2 key derivation. Your keys are encrypted before they ever leave your browser. Even we can't read your vault — true zero-knowledge.</p>
+      <span class="feature-tag tag-free">FREE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Dashboard Summary</h3>
+      <p>See all your vaults and services at a glance from the web dashboard. Track which keys you have, when they were last used, and your security health score.</p>
+      <a href="https://dashboard.yourlockbox.dev" target="_blank" class="feature-cta">Open Dashboard &rarr;</a>
       <span class="feature-tag tag-free">FREE</span>
     </div>
     <div class="feature-card">
       <div class="feature-icon">🤖</div>
-      <h3>Works with AI Coding Tools</h3>
-      <p>Claude Code, Cursor, and Windsurf can store and retrieve your keys directly — no copy-pasting, no .env files lying around. Just ask your AI tool for the key it needs.</p>
+      <h3>Works with AI Tools</h3>
+      <p>MCP server integration for Claude Code, Cursor, and Windsurf. Plus a CLI for scripts and automation. Your AI tools can access keys without seeing the actual values.</p>
       <span class="feature-tag tag-free">FREE</span>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🛡️</div>
-      <h3>Leak-Proof .env Files</h3>
-      <p>Your .env files contain safe references like <code style="color:var(--accent);background:var(--bg-terminal);padding:2px 6px;border-radius:4px;font-size:12px;">lockbox://openai/KEY</code> instead of real keys. Push to GitHub all day — nothing sensitive is exposed.</p>
+      <div class="feature-icon">🔑</div>
+      <h3>12-Word Recovery</h3>
+      <p>MetaMask-style recovery phrase. If you forget your password or switch devices, your 12-word phrase restores everything. No account needed, no server dependency.</p>
       <span class="feature-tag tag-free">FREE</span>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📋</div>
-      <h3>Know Who Accessed What</h3>
-      <p>Every time a key is used — whether by you or by an AI tool — it's logged. If something goes wrong, you can see exactly what was accessed and when.</p>
-      <span class="feature-tag tag-free">FREE</span>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📦</div>
-      <h3>Import Your Existing Keys</h3>
-      <p>Already have .env files? Import them in one command. Lockbox reads your existing files and stores everything safely. Migration takes seconds, not hours.</p>
-      <span class="feature-tag tag-free">FREE</span>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">⏱️</div>
-      <h3>Locks Itself Automatically</h3>
-      <p>Walk away from your computer? Your vault locks itself after 15 minutes. Someone guessing your password? It slows down after a few wrong tries. Copied a key? Clipboard clears itself.</p>
-      <span class="feature-tag tag-free">FREE</span>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">☁️</div>
-      <h3>Sync Across Your Machines</h3>
-      <p>Use your vault on your laptop and your desktop. Everything is encrypted before it ever leaves your machine — we can never see your keys, even on our servers.</p>
-      <span class="feature-tag tag-pro">PRO — COMING SOON</span>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <h3>Web Dashboard</h3>
-      <p>Manage your vaults and keys from a visual interface. Create vaults, add keys, view audit logs, and configure your setup — all from your browser.</p>
-      <a href="https://dashboard.yourlockbox.dev" target="_blank" class="feature-cta">Launch Dashboard &rarr;</a>
-      <span class="feature-tag tag-free">FREE</span>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">👥</div>
-      <h3>Share Keys with Your Team</h3>
-      <p>Create shared vaults for your team. Control who can see which keys. See what your team members are using. No more sharing secrets over Slack or email.</p>
-      <span class="feature-tag tag-pro">TEAM — COMING SOON</span>
     </div>
   </div>
 </section>
@@ -655,27 +737,33 @@
 <!-- HOW IT WORKS -->
 <section>
   <div class="section-label">How It Works</div>
-  <h2 class="section-title">Three commands. Thirty seconds.</h2>
-  <p class="section-desc">No account to create. No server to set up. No configuration files to edit. Just install, store your key, and start building.</p>
+  <h2 class="section-title">Three steps. Thirty seconds.</h2>
+  <p class="section-desc">Install the extension, create your wallet, and start adding keys. No server to set up. No account required.</p>
 
   <div class="steps animate-in">
     <div class="step">
       <div class="step-number">01</div>
-      <h3>Create your vault</h3>
-      <p>Pick a master password. That's it. Lockbox creates an encrypted vault on your machine — your keys never leave your computer unless you want them to.</p>
-      <code>$ npm install -g lockbox-vault</code>
+      <h3>Install the Extension</h3>
+      <p>Add Lockbox to Chrome with one click. A small lock icon appears in your toolbar — that's your wallet.</p>
+      <div class="step-visual">
+        <span class="sv-accent">+</span> Add to Chrome &rarr; <span class="sv-accent">Done</span>
+      </div>
     </div>
     <div class="step">
       <div class="step-number">02</div>
-      <h3>Store your keys</h3>
-      <p>Add your API keys one by one, or import an entire .env file at once. Organise them by project so you always know which keys belong where.</p>
-      <code>$ lockbox add openai API_KEY sk-...</code>
+      <h3>Add Your Keys</h3>
+      <p>Paste keys manually, import from .env files, or let Lockbox auto-capture them as they appear on API platforms. Everything gets encrypted instantly.</p>
+      <div class="step-visual">
+        <span class="sv-accent">OPENAI_API_KEY</span> &rarr; Encrypted &rarr; <span class="sv-accent">Saved</span>
+      </div>
     </div>
     <div class="step">
       <div class="step-number">03</div>
-      <h3>Build safely</h3>
-      <p>Run your app through Lockbox and it injects your real keys only while your app is running. Or let your AI tool pull keys directly. Either way, nothing is saved to disk.</p>
-      <code>$ lockbox run "npm start"</code>
+      <h3>Code Securely</h3>
+      <p>Visit any supported platform and Lockbox auto-fills your keys. Or use the CLI and MCP server to let your AI tools access keys safely. Nothing is saved to disk.</p>
+      <div class="step-visual">
+        <span class="sv-accent">Auto-fill</span> detected on openai.com
+      </div>
     </div>
   </div>
 </section>
@@ -700,68 +788,68 @@
       </thead>
       <tbody>
         <tr>
-          <td>Works with AI tools</td>
-          <td class="col-lockbox"><span class="check">✓ Built-in</span></td>
-          <td><span class="cross">✗</span></td>
-          <td><span class="cross">✗</span></td>
-          <td><span class="cross">✗</span></td>
-          <td class="dead">Shut down</td>
-        </tr>
-        <tr>
-          <td>Leak-proof .env files</td>
-          <td class="col-lockbox"><span class="check">✓ lockbox://</span></td>
-          <td><span class="cross">✗</span></td>
-          <td><span class="cross">✗</span></td>
-          <td><span class="cross">✗</span></td>
-          <td class="dead">Shut down</td>
-        </tr>
-        <tr>
-          <td>Works offline</td>
-          <td class="col-lockbox"><span class="check">✓</span></td>
-          <td><span class="cross">✗ Cloud only</span></td>
-          <td><span class="cross">✗ Cloud only</span></td>
+          <td>Browser extension wallet</td>
+          <td class="col-lockbox"><span class="check">&#10003; Built-in</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td><span class="cross">&#10007;</span></td>
           <td>Partial</td>
           <td class="dead">Shut down</td>
         </tr>
         <tr>
-          <td>Logs AI tool access</td>
-          <td class="col-lockbox"><span class="check">✓ CLI + AI</span></td>
-          <td><span class="cross">✗</span></td>
-          <td>Basic</td>
-          <td><span class="cross">✗</span></td>
+          <td>Works with AI tools</td>
+          <td class="col-lockbox"><span class="check">&#10003; MCP + CLI</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td class="dead">Shut down</td>
+        </tr>
+        <tr>
+          <td>Auto-detect API keys</td>
+          <td class="col-lockbox"><span class="check">&#10003; 20+ sites</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td class="dead">Shut down</td>
+        </tr>
+        <tr>
+          <td>Works offline</td>
+          <td class="col-lockbox"><span class="check">&#10003;</span></td>
+          <td><span class="cross">&#10007; Cloud only</span></td>
+          <td><span class="cross">&#10007; Cloud only</span></td>
+          <td>Partial</td>
+          <td class="dead">Shut down</td>
+        </tr>
+        <tr>
+          <td>Recovery phrase</td>
+          <td class="col-lockbox"><span class="check">&#10003; 12-word</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td><span class="cross">&#10007;</span></td>
           <td class="dead">Shut down</td>
         </tr>
         <tr>
           <td>Open source</td>
-          <td class="col-lockbox"><span class="check">✓ MIT</span></td>
-          <td><span class="cross">✗</span></td>
-          <td><span class="check">✓</span></td>
-          <td><span class="cross">✗</span></td>
+          <td class="col-lockbox"><span class="check">&#10003; MIT</span></td>
+          <td><span class="cross">&#10007;</span></td>
+          <td><span class="check">&#10003;</span></td>
+          <td><span class="cross">&#10007;</span></td>
           <td class="dead">Shut down</td>
         </tr>
         <tr>
           <td>Free tier</td>
-          <td class="col-lockbox"><span class="check">✓ Generous</span></td>
+          <td class="col-lockbox"><span class="check">&#10003; Generous</span></td>
           <td>Limited</td>
           <td>Limited</td>
           <td><span class="cross">Trial only</span></td>
-          <td class="dead">—</td>
+          <td class="dead">&mdash;</td>
         </tr>
         <tr>
           <td>Paid price</td>
           <td class="col-lockbox"><span class="check">$5/mo</span></td>
-          <td>$7–21/user</td>
-          <td>$8–18/user</td>
-          <td>$3–8/user</td>
-          <td class="dead">—</td>
-        </tr>
-        <tr>
-          <td>Time to get started</td>
-          <td class="col-lockbox"><span class="check">30 seconds</span></td>
-          <td>15+ minutes</td>
-          <td>10+ minutes</td>
-          <td>5+ minutes</td>
-          <td class="dead">—</td>
+          <td>$7&ndash;21/user</td>
+          <td>$8&ndash;18/user</td>
+          <td>$3&ndash;8/user</td>
+          <td class="dead">&mdash;</td>
         </tr>
       </tbody>
     </table>
@@ -772,7 +860,7 @@
 <section id="pricing">
   <div class="section-label">Pricing</div>
   <h2 class="section-title">Free to start. Cheap to grow.</h2>
-  <p class="section-desc">Everything you need to keep your API keys safe is free. Upgrade to Pro when you need more vaults, more keys, and premium features.</p>
+  <p class="section-desc">The wallet extension and CLI are free. Upgrade to Pro for unlimited vaults, cloud sync, and premium features.</p>
 
   <div class="pricing-grid animate-in">
     <div class="price-card">
@@ -781,15 +869,15 @@
       <div class="price-annual">No credit card needed</div>
       <ul class="price-features">
         <li>1 vault, 25 keys</li>
-        <li>Full CLI access (16 commands)</li>
+        <li>Browser extension wallet</li>
+        <li>Auto-detect &amp; auto-fill</li>
+        <li>AES-256-GCM encryption</li>
+        <li>12-word recovery phrase</li>
         <li>MCP server integration</li>
-        <li>Leak-proof .env proxy system</li>
-        <li>Dashboard access</li>
-        <li>Chrome & VS Code extensions</li>
-        <li>Auto-lock & brute-force protection</li>
-        <li>Open source (MIT licence)</li>
+        <li>Full CLI access</li>
+        <li>Dashboard summary view</li>
       </ul>
-      <a href="#install" class="price-btn price-btn-free">Install Now — 30 Seconds</a>
+      <a href="https://github.com/Waldo777-bh/lockbox/releases/latest" target="_blank" class="price-btn price-btn-free">Install Extension &mdash; Free</a>
     </div>
     <div class="price-card featured">
       <div class="price-name">Pro</div>
@@ -797,9 +885,9 @@
       <div class="price-annual">or $48/year (save 20%)</div>
       <ul class="price-features">
         <li>Everything in Free</li>
-        <li>Unlimited vaults & keys</li>
+        <li>Unlimited vaults &amp; keys</li>
+        <li>Cloud sync across devices</li>
         <li>Key expiry reminders</li>
-        <li>Cloud sync (coming soon)</li>
         <li>Full dashboard write access</li>
         <li>Full extension write access</li>
         <li>Priority support</li>
@@ -819,91 +907,59 @@
         <li>SSO integration</li>
         <li>Easy team onboarding</li>
       </ul>
-      <a href="#waitlist" class="price-btn price-btn-team">Join Team Waitlist</a>
+      <a href="https://dashboard.yourlockbox.dev" target="_blank" class="price-btn price-btn-team">Join Team Waitlist</a>
     </div>
   </div>
 </section>
 
-<!-- WAITLIST -->
-<section class="waitlist-section" id="waitlist">
-  <div class="waitlist-box animate-in">
-    <h2>Be first to get Pro.</h2>
-    <p>We're building sync, the visual dashboard, and team features based on what our users want most. Join the waitlist to help shape what comes next — and get early access when it's ready.</p>
-    <form class="waitlist-form" id="waitlistForm" action="https://formspree.io/f/xqednjje" method="POST">
-      <input type="email" name="email" class="waitlist-input" placeholder="you@email.com" required id="waitlistEmail">
-      <input type="hidden" name="_subject" value="New Lockbox Pro Waitlist Signup">
-      <button type="submit" class="waitlist-submit">Join Waitlist</button>
-    </form>
-    <div class="waitlist-success" id="waitlistSuccess">✓ You're on the list! We'll be in touch.</div>
-    <div class="waitlist-count">The free version is ready right now — <a href="https://www.npmjs.com/package/lockbox-vault" target="_blank" style="color:var(--accent);text-decoration:none;">install in 30 seconds</a></div>
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-box animate-in">
+    <h2>Secure your keys in 30 seconds.</h2>
+    <p>Install the Lockbox wallet extension and never worry about leaking API keys again. Free, open source, and encrypted by default.</p>
+    <div class="cta-buttons">
+      <a href="https://github.com/Waldo777-bh/lockbox/releases/latest" target="_blank" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Install Lockbox Wallet
+      </a>
+      <a href="https://dashboard.yourlockbox.dev" target="_blank" class="btn-secondary">Open Dashboard</a>
+    </div>
+    <div class="cta-alt">
+      Or install the CLI: <a href="https://www.npmjs.com/package/lockbox-vault" target="_blank">npm install -g lockbox-vault</a>
+    </div>
   </div>
 </section>
 
 <footer>
   <div class="footer-inner">
     <div class="footer-left">
-      <a href="#" class="logo" style="text-decoration:none;">
-        <div class="logo-icon">
-          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
-        </div>
-        <span class="logo-text">lockbox</span>
-      </a>
-      <span class="footer-copy">© 2026 Lockbox. MIT Licensed.</span>
+      <div class="footer-brand">
+        <a href="#" class="logo" style="text-decoration:none;">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+          </div>
+          <span class="logo-text">lockbox</span>
+        </a>
+        <span class="footer-copy">&copy; 2026 Lockbox. MIT Licensed.</span>
+      </div>
+      <span class="footer-tagline">Lockbox &mdash; The crypto wallet for your API keys</span>
     </div>
     <div class="footer-links">
+      <a href="https://github.com/Waldo777-bh/lockbox/releases/latest" target="_blank">Extension</a>
       <a href="https://dashboard.yourlockbox.dev" target="_blank">Dashboard</a>
+      <a href="https://www.npmjs.com/package/lockbox-vault" target="_blank">CLI (npm)</a>
       <a href="https://github.com/Waldo777-bh/lockbox" target="_blank">GitHub</a>
-      <a href="https://www.npmjs.com/package/lockbox-vault" target="_blank">npm</a>
+      <a href="https://dashboard.yourlockbox.dev/dashboard/pricing" target="_blank">Pricing</a>
       <a href="mailto:brent@fitnessnation.au">Support</a>
-      <a href="#">Docs</a>
-      <a href="#">Security</a>
     </div>
   </div>
 </footer>
 
 <script>
-  function copyInstall(btn) {
-    navigator.clipboard.writeText('npm install -g lockbox-vault').then(() => {
-      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy';
-        btn.classList.remove('copied');
-      }, 2000);
-    });
-  }
-
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
   }, { threshold: 0.1 });
   document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
-
-  document.getElementById('waitlistForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const email = document.getElementById('waitlistEmail').value;
-    const btn = this.querySelector('.waitlist-submit');
-    const origText = btn.textContent;
-    btn.textContent = 'Sending...';
-    btn.disabled = true;
-
-    try {
-      const res = await fetch(this.action, {
-        method: 'POST',
-        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, _subject: 'New Lockbox Pro Waitlist Signup' })
-      });
-      if (res.ok) {
-        this.style.display = 'none';
-        document.getElementById('waitlistSuccess').style.display = 'block';
-      } else {
-        btn.textContent = 'Try again';
-        btn.disabled = false;
-      }
-    } catch (err) {
-      btn.textContent = 'Try again';
-      btn.disabled = false;
-    }
-  });
 </script>
 </body>
 </html>
